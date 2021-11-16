@@ -51,6 +51,7 @@ class HomeController extends Controller
             $q->where('TIPO', 'F')
             ->orWhere('TIPO', 'N');
         })
+        ->where('ANTERIOR', '!=', 'GLOBAL')
         ->groupBy('monthKey')
         ->orderBy('FECHA', 'ASC')
         ->get();
@@ -63,6 +64,7 @@ class HomeController extends Controller
             $q->where('TIPO', 'F')
             ->orWhere('TIPO', 'N');
         })
+        ->where('ANTERIOR', '!=', 'GLOBAL')
         ->whereYear('FECHA', $yearpasado)
         ->groupBy('monthKey')
         ->orderBy('FECHA', 'ASC')
@@ -94,6 +96,7 @@ class HomeController extends Controller
             $q->where('TIPO', 'F')
             ->orWhere('TIPO', 'N');
         })
+        ->where('ANTERIOR', '!=', 'GLOBAL')
         ->count();
 
         $countCancelados = Documentos::where('FECHA', "$hoy")
@@ -106,6 +109,7 @@ class HomeController extends Controller
             $q->where('TIPO', 'F')
             ->orWhere('TIPO', 'N');
         })
+        ->where('ANTERIOR', '!=', 'GLOBAL')
         ->sum('TOTAL');
 
         if ($contDocumentos > 0) {
@@ -119,6 +123,7 @@ class HomeController extends Controller
             $q->where('TIPO', 'F')
             ->orWhere('TIPO', 'N');
         })
+        ->where('ANTERIOR', '!=', 'GLOBAL')
             ->sum('TOTAL');
 
         $ventasMes = Documentos::whereMonth('FECHA', "$mes")
@@ -127,6 +132,7 @@ class HomeController extends Controller
             $q->where('TIPO', 'F')
             ->orWhere('TIPO', 'N');
         })
+        ->where('ANTERIOR', '!=', 'GLOBAL')
             ->sum('TOTAL');
 
         $ventasTotalesHoyMesPasado = Documentos::where('FECHA', "$hoyMesPasado")
@@ -134,6 +140,7 @@ class HomeController extends Controller
             $q->where('TIPO', 'F')
             ->orWhere('TIPO', 'N');
         })
+        ->where('ANTERIOR', '!=', 'GLOBAL')
             ->sum('TOTAL');
 
         if ($ventasTotalesHoyMesPasado > 0) {
@@ -148,6 +155,7 @@ class HomeController extends Controller
             $q->where('TIPO', 'F')
             ->orWhere('TIPO', 'N');
         })
+        ->where('ANTERIOR', '!=', 'GLOBAL')
             ->sum('TOTAL');
 
         if ($ventasMesAnterior > 0) {
@@ -203,6 +211,7 @@ class HomeController extends Controller
             $q->where('doc.TIPO', 'F')
             ->orWhere('doc.TIPO', 'N');
         })
+            ->where('doc.ANTERIOR', '!=', 'GLOBAL')
         ->groupBy('doc.EMISOR')
         ->orderBy('TOTAL', 'desc')
         ->limit(5)
