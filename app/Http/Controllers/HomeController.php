@@ -34,6 +34,49 @@ class HomeController extends Controller
         $hoyMesPasado = Carbon::today()->subMonth();
         $mesAnterior = Carbon::today()->subMonth()->month;
         $year = Carbon::today()->year;
+        $yearpasado = Carbon::today()->subYear()->year;
+
+        // GRAFICAS //
+
+        $ventasGrafica = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        $ventasPasadoGrafica = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+
+
+        $yearActualGrafica = Documentos::select(
+            DB::raw('sum(TOTAL) as sums'),
+            DB::raw("DATE_FORMAT(FECHA,'%m') as monthKey")
+        )
+        ->whereYear('FECHA', $year)
+        ->where(function ($q) {
+            $q->where('TIPO', 'F')
+            ->orWhere('TIPO', 'N');
+        })
+        ->groupBy('monthKey')
+        ->orderBy('FECHA', 'ASC')
+        ->get();
+
+        $yearPasadoGrafica = Documentos::select(
+            DB::raw('sum(TOTAL) as sums'),
+            DB::raw("DATE_FORMAT(FECHA,'%m') as monthKey")
+        )
+        ->where(function ($q) {
+            $q->where('TIPO', 'F')
+            ->orWhere('TIPO', 'N');
+        })
+        ->whereYear('FECHA', $yearpasado)
+        ->groupBy('monthKey')
+        ->orderBy('FECHA', 'ASC')
+        ->get();
+
+        foreach ($yearActualGrafica as $venta) {
+            $ventasGrafica[$venta->monthKey - 1] = $venta->sums;
+        }
+
+        foreach ($yearPasadoGrafica as $venta) {
+            $ventasPasadoGrafica[$venta->monthKey - 1] = $venta->sums;
+        }
+        $ventasGrafica = json_encode($ventasGrafica);
+        $ventasPasadoGrafica = json_encode($ventasPasadoGrafica);
 
         // TARJETAS //
 
@@ -189,7 +232,10 @@ class HomeController extends Controller
             'ventasTotalesHoy',
             'ventasMes',
             'crecimiento',
-            'metaCrecimiento'
+            'metaCrecimiento',
+            'yearActualGrafica',
+            'ventasGrafica',
+            'ventasPasadoGrafica'
             )
         );
     }

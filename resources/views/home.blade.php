@@ -120,7 +120,18 @@
                         <h3 class="card-title">%{{number_format($metaCrecimiento, 2, ".", ",")}}</h3>
                     </div>
                     <div class="card-footer">
-                        
+
+                    </div>
+                </div>
+            </div>
+            <!-- Grafica -->
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Ventas año en curso vs año pasado</h4>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="canvas" height="280" width="600"></canvas>
                     </div>
                 </div>
             </div>
@@ -275,4 +286,62 @@
         </div>
     </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.6.0/chart.min.js"></script>
+<script>
+    var actual = <?php echo $ventasGrafica; ?>;
+    var pasado = <?php echo $ventasPasadoGrafica; ?>;
+    var barChartData = {
+        labels: ['Enero',
+            'Febrero',
+            'Marzo',
+            'Abril',
+            'Mayo',
+            'Junio',
+            'Julio',
+            'Agosto',
+            'Septiembre',
+            'Octubre',
+            'Noviembre',
+            'Diciembre'
+        ],
+        datasets: [{
+                label: 'Actual',
+                backgroundColor: "red",
+                data: actual,
+                borderColor: 'rgb(255, 035, 001)',
+            },
+            {
+                label: 'pasado',
+                backgroundColor: "blue",
+                data: pasado,
+                borderColor: 'rgb(30,144,255)',
+            },
+        ]
+    };
+
+    window.onload = function() {
+        var ctx = document.getElementById("canvas").getContext("2d");
+        window.myBar = new Chart(ctx, {
+            type: 'line',
+            data: barChartData,
+            options: {
+                scales: {
+                    y: {
+                        ticks: {
+                            // Include a dollar sign in the ticks
+                            callback: function(value, index, values) {
+                                return '$' + (value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                            }
+                        }
+                    },
+                },
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Yearly User Joined'
+                }
+            }
+        });
+    };
+</script>
 @endsection
