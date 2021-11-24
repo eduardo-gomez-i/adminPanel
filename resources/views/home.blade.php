@@ -320,7 +320,6 @@
     var mtd = <?php echo $ventasMesGrafica; ?>;
     var mtdp = <?php echo $ventasMesPasadoGrafica; ?>;
     var dias = <?php echo $dias; ?>;
-    console.log(mtd);
 
     var barChartData = {
         labels: meses,

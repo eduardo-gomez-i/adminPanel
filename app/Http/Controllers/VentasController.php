@@ -2,6 +2,9 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Documentos;
+use App\Models\Partidas;
+use App\Models\Personal;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -10,8 +13,92 @@ class VentasController extends Controller
 {
     public function index()
     {
-        $hoy = Carbon::today()->subDay();
+        $hoy = Carbon::today();
+
+        $contPartidas = Partidas::where('FECHA', "$hoy")
+        ->where(function ($q) {
+            $q->where(
+                'TIPO',
+                'F'
+            )
+                ->orWhere('TIPO', 'N');
+        })
+        ->count();
+
+        $contDocumentos = Documentos::where('FECHA', "$hoy")
+        ->where(function ($q) {
+            $q->where('TIPO', 'F')
+            ->orWhere('TIPO', 'N');
+        })
+        ->where('ANTERIOR', '!=', 'GLOBAL')
+        ->count();
+
+        $countCancelados = Documentos::where('FECHA', "$hoy")
+        ->where('ESTADO', 'C')
+        ->with('clientes')
+        ->count();
+
+        $ventasTotalesHoy = Documentos::where('FECHA', "$hoy")
+        ->where(function ($q) {
+            $q->where('TIPO', 'F')
+            ->orWhere('TIPO', 'N');
+        })
+        ->where('ANTERIOR', '!=', 'GLOBAL')
+            ->sum('TOTAL');
         //$hoy = '2021-08-27';
+
+        $ventasTotales = Documentos::where('FECHA', "$hoy")
+        ->where(function ($q) {
+            $q->where('TIPO', 'F')
+            ->orWhere('TIPO', 'N');
+        })
+        ->where('ANTERIOR', '!=', 'GLOBAL')
+        ->sum('TOTAL');
+
+        if ($contDocumentos > 0) {
+            $ticketPromedio = $ventasTotales / $contDocumentos;
+        } else {
+            $ticketPromedio = 0;
+        }
+
+        $documentosVendedor = Personal::select('NOMBRE')
+        ->withCount([
+            'Documentos AS documentos_sum' => function ($query) use ($hoy) {
+                $query->select(DB::raw('SUM(TOTAL) as documentos_sum'))
+                ->where(function ($q) {
+                    $q->where('doc.TIPO', 'F')
+                    ->orWhere('doc.TIPO', 'N');
+                })->where('doc.FECHA', "$hoy");
+            },
+            'Documentos' => function ($query) use ($hoy) {
+                $query->where(function ($q) {
+                    $q->where('doc.TIPO', 'F')
+                    ->orWhere('doc.TIPO', 'N');
+                })->where('doc.FECHA', "$hoy");
+            }, 'Partidas' => function ($query) use ($hoy) {
+                $query->where(function ($q) {
+                    $q->where('desdoc.TIPO', 'F')
+                    ->orWhere('desdoc.TIPO', 'N');
+                })->where('desdoc.FECHA', "$hoy");
+            }
+        ])
+        ->Validos()
+        ->orderBy('documentos_sum', 'desc')
+        ->get();
+
+        foreach ($documentosVendedor as $key => $datos) {
+            if ($datos->documentos_sum > 0) {
+                $nombres[$key] = $datos->NOMBRE;
+                $ventas[$key] = $datos->documentos_sum;
+                $documentos[$key] = $datos->documentos_count;
+                $partidas[$key] = $datos->partidas_count;
+            }
+        }
+
+        $nombres= json_encode($nombres);
+        $ventas = json_encode($ventas);
+        $documentos = json_encode($documentos);
+        $partidas = json_encode($partidas);
 
         $reporte = DB::connection('ferrum')->table('per')
         ->join('doc', 'per.CATEGORIA', '=', 'doc.EMISOR')
@@ -119,12 +206,18 @@ class VentasController extends Controller
             ->orderBy('parTot', 'desc')
             ->get();
 
-
-        //$personal = Per::query();
-
         return view('ventas.index', [
             'reporte' => $reporte,
             'reporte2' => $reporte2,
+            'ventasTotalesHoy' => $ventasTotalesHoy,
+            'contPartidas' => $contPartidas,
+            'contDocumentos' => $contDocumentos,
+            'countCancelados' => $countCancelados,
+            'ticketPromedio' => $ticketPromedio,
+            'nombres' => $nombres,
+            'ventas' => $ventas,
+            'documentos' => $documentos,
+            'partidas' => $partidas
         ]);
     }
 }
