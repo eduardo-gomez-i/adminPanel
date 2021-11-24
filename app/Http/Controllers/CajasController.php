@@ -64,6 +64,7 @@ class CajasController extends Controller
         ->where('doc.ESTADO', 'I')
         ->where('doc.AFECTADOC', 'S')
         ->where('doc.TIPO', 'F')
+        ->where('doc.TOTALPAGADO', '>', 0)
         ->where('doc.VENCE', '>=', "$hoy")
         //->orderBY('HORA', 'desc')
         ->with('clientes')
