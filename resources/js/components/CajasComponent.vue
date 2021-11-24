@@ -292,6 +292,7 @@ export default {
     tabla(nombre) {
       this.$nextTick(() => {
         $(nombre).DataTable({
+          retrieve: true,
           dom:
             "B<'row'<'col-sm-12 col-md-6'l><'col-sm-12 col-md-6'f>>" +
             "<'row'<'col-sm-12'tr>>" +

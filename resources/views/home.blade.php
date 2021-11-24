@@ -341,7 +341,7 @@
     var barChartData2 = {
         datasets: [{
                 label: 'Actual',
-                backgroundColor: "red",
+                backgroundColor: "orange",
                 data: mtd,
                 borderColor: 'rgb(255, 035, 001)',
             },
