@@ -22,9 +22,9 @@
             <!-- DOCUMENTOS -->
             <div class="col-lg-4 col-md-6 col-sm-6">
                 <div class="card card-stats">
-                    <div class="card-header card-header-success card-header-icon">
+                    <div class="card-header card-header-info card-header-icon">
                         <div class="card-icon">
-                            <i class="material-icons">store</i>
+                            <i class="material-icons">content_copy</i>
                         </div>
                         <p class="card-category">DOCUMENTOS</p>
                         <h3 class="card-title">{{ $contDocumentos }}</h3>
@@ -49,27 +49,12 @@
                     </div>
                 </div>
             </div>
-            <!-- TICKET PROMEDIO -->
-            <div class="col-lg-4 col-md-6 col-sm-6">
-                <div class="card card-stats">
-                    <div class="card-header card-header-info card-header-icon">
-                        <div class="card-icon">
-                            <i class="fa fa-twitter"></i>
-                        </div>
-                        <p class="card-category">TICKET PROMEDIO</p>
-                        <h3 class="card-title">$ {{number_format($ticketPromedio, 2, ".", ",")}}</h3>
-                    </div>
-                    <div class="card-footer">
-
-                    </div>
-                </div>
-            </div>
             <!-- VENTAS DEL DIA -->
             <div class="col-lg-4 col-md-6 col-sm-6">
                 <div class="card card-stats">
-                    <div class="card-header card-header-warning card-header-icon">
+                    <div class="card-header card-header-success card-header-icon">
                         <div class="card-icon">
-                            <i class="material-icons">content_copy</i>
+                            <i class="material-icons">attach_money</i>
                         </div>
                         <p class="card-category">VENTAS DEL DIA</p>
                         <h3 class="card-title">$ {{number_format($ventasTotalesHoy, 2, ".", ",")}}</h3>
@@ -82,12 +67,42 @@
             <!-- VENTAS DEL MES -->
             <div class="col-lg-4 col-md-6 col-sm-6">
                 <div class="card card-stats">
-                    <div class="card-header card-header-warning card-header-icon">
+                    <div class="card-header card-header-success card-header-icon">
                         <div class="card-icon">
-                            <i class="material-icons">content_copy</i>
+                            <i class="material-icons">attach_money</i>
                         </div>
-                        <p class="card-category">VENTAS DEL MES</p>
-                        <h3 class="card-title">$ {{number_format($ventasMes, 2, ".", ",")}}</h3>
+                        <p class="card-category">VENTAS DEL MES (MTD)</p>
+                        <h3 class="card-title">%{{number_format(($ventasMes/$ventasMesYearPasado)*100, 2, ".", ",")}}</h3>
+                    </div>
+                    <div class="card-footer">
+
+                    </div>
+                </div>
+            </div>
+            <!-- VENTAS DEL Año -->
+            <div class="col-lg-4 col-md-6 col-sm-6">
+                <div class="card card-stats">
+                    <div class="card-header card-header-success card-header-icon">
+                        <div class="card-icon">
+                            <i class="material-icons">attach_money</i>
+                        </div>
+                        <p class="card-category">VENTAS DEL AÑO (YTD)</p>
+                        <h3 class="card-title">%{{number_format(($ventasYear/$ventasYearPasado)*100, 2, ".", ",")}}</h3>
+                    </div>
+                    <div class="card-footer">
+
+                    </div>
+                </div>
+            </div>
+            <!-- TICKET PROMEDIO -->
+            <div class="col-lg-4 col-md-6 col-sm-6">
+                <div class="card card-stats">
+                    <div class="card-header card-header-info card-header-icon">
+                        <div class="card-icon">
+                            <i class="material-icons">confirmation_number</i>
+                        </div>
+                        <p class="card-category">TICKET PROMEDIO</p>
+                        <h3 class="card-title">$ {{number_format($ticketPromedio, 2, ".", ",")}}</h3>
                     </div>
                     <div class="card-footer">
 
@@ -124,7 +139,18 @@
                     </div>
                 </div>
             </div>
-            <!-- Grafica -->
+            <!-- Grafica Mes -->
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h4 class="card-title">Ventas mes en curso vs mes año pasado</h4>
+                    </div>
+                    <div class="card-body">
+                        <canvas id="mes" height="280" width="600"></canvas>
+                    </div>
+                </div>
+            </div>
+            <!-- Grafica Year -->
             <div class="col-md-12">
                 <div class="card">
                     <div class="card-header">
@@ -290,20 +316,14 @@
 <script>
     var actual = <?php echo $ventasGrafica; ?>;
     var pasado = <?php echo $ventasPasadoGrafica; ?>;
+    var meses = <?php echo $meses; ?>;
+    var mtd = <?php echo $ventasMesGrafica; ?>;
+    var mtdp = <?php echo $ventasMesPasadoGrafica; ?>;
+    var dias = <?php echo $dias; ?>;
+    console.log(mtd);
+
     var barChartData = {
-        labels: ['Enero',
-            'Febrero',
-            'Marzo',
-            'Abril',
-            'Mayo',
-            'Junio',
-            'Julio',
-            'Agosto',
-            'Septiembre',
-            'Octubre',
-            'Noviembre',
-            'Diciembre'
-        ],
+        labels: meses,
         datasets: [{
                 label: 'Actual',
                 backgroundColor: "red",
@@ -314,6 +334,22 @@
                 label: 'pasado',
                 backgroundColor: "blue",
                 data: pasado,
+                borderColor: 'rgb(30,144,255)',
+            },
+        ]
+    };
+
+    var barChartData2 = {
+        datasets: [{
+                label: 'Actual',
+                backgroundColor: "red",
+                data: mtd,
+                borderColor: 'rgb(255, 035, 001)',
+            },
+            {
+                label: 'pasado',
+                backgroundColor: "blue",
+                data: mtdp,
                 borderColor: 'rgb(30,144,255)',
             },
         ]
@@ -339,6 +375,39 @@
                 title: {
                     display: true,
                     text: 'Yearly User Joined'
+                }
+            }
+        });
+
+        var ctx2 = document.getElementById("mes").getContext("2d");
+        window.myBar = new Chart(ctx2, {
+            type: 'bar',
+            data: barChartData2,
+            options: {
+                scales: {
+                    xAxes: [{
+                        type: 'linear',
+                        stacked: true,
+                    }],
+                    yAxes: [{
+                        stacked: true,
+                        ticks: {
+                            beginAtZero: true
+                        }
+                    }],
+                    y: {
+                        ticks: {
+                            // Include a dollar sign in the ticks
+                            callback: function(value, index, values) {
+                                return '$' + (value).toFixed(2).replace(/\d(?=(\d{3})+\.)/g, '$&,');
+                            }
+                        }
+                    },
+                },
+                responsive: true,
+                title: {
+                    display: true,
+                    text: 'Mes ventas'
                 }
             }
         });

@@ -30,16 +30,78 @@ class HomeController extends Controller
     {
         // FECHAS //
         $hoy = Carbon::today();
+        $numeroDia = Carbon::today()->day;
         $mes = Carbon::today()->month;
         $hoyMesPasado = Carbon::today()->subMonth();
         $mesAnterior = Carbon::today()->subMonth()->month;
         $year = Carbon::today()->year;
         $yearpasado = Carbon::today()->subYear()->year;
 
+        $yeartodate = Carbon::today()->endOfMonth()->subYear();
+
         // GRAFICAS //
 
-        $ventasGrafica = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
-        $ventasPasadoGrafica = [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+        $meses = array("Enero","Febrero","Marzo","Abril","Mayo","Junio","Julio","Agosto","Septiembre","Octubre","Noviembre","Diciembre");
+
+        $meses = array_slice($meses,0 , $mes);
+
+        for ($i=0; $i < $numeroDia; $i++) { 
+            $dias[$i] = $i+1;
+        }
+
+        $ventasGrafica = [];
+        $ventasPasadoGrafica = [];
+
+        $ventasMesGrafica = [];
+        $ventasMesPasadoGrafica = [];
+
+        $monthDay = Documentos::select(
+            DB::raw('sum(TOTAL) as sums'),
+            DB::raw("DATE_FORMAT(FECHA,'%d') as dayKey")
+        )
+            ->where(function ($q) {
+                $q->where('TIPO', 'F')
+                ->orWhere('TIPO', 'N');
+            })
+            ->where('ANTERIOR', '!=', 'GLOBAL')
+            ->whereBetween('FECHA', [Carbon::now()->startOfMonth(), $hoy])
+            ->groupBy('dayKey')
+            ->orderBy('FECHA', 'ASC')
+            ->get();
+
+        $monthDayyearPasado = Documentos::select(
+            DB::raw('sum(TOTAL) as sums'),
+            DB::raw("DATE_FORMAT(FECHA,'%d') as dayKey")
+        )
+            ->where(function ($q) {
+                $q->where('TIPO', 'F')
+                ->orWhere('TIPO', 'N');
+            })
+            ->where('ANTERIOR', '!=', 'GLOBAL')
+            ->whereBetween('FECHA', [Carbon::now()->startOfMonth()->subYear(), Carbon::now()->subYear()])
+            ->groupBy('dayKey')
+            ->orderBy('FECHA', 'ASC')
+            ->get();
+
+        foreach ($monthDay as $key => $ventamtd) {
+            $ventasMesGrafica[ltrim($ventamtd->dayKey, "0")] = $ventamtd->sums;
+        }
+
+        for ($i=0; $i < $numeroDia; $i++) {
+            if (!isset($ventasMesGrafica[$i + 1])) {
+                $ventasMesGrafica[$i + 1] = '0';
+            }
+        }
+        
+        foreach ($monthDayyearPasado as $ventamtdp) {
+            $ventasMesPasadoGrafica[ltrim($ventamtdp->dayKey, "0")] = $ventamtdp->sums;
+        }
+        
+
+        $ventasMesGrafica = json_encode($ventasMesGrafica);
+        $ventasMesPasadoGrafica = json_encode($ventasMesPasadoGrafica);
+        $dias = json_encode($dias);
+
 
 
         $yearActualGrafica = Documentos::select(
@@ -65,6 +127,7 @@ class HomeController extends Controller
             ->orWhere('TIPO', 'N');
         })
         ->where('ANTERIOR', '!=', 'GLOBAL')
+        ->whereBetween('FECHA',[date('Y-01-01', strtotime("-1 year")), $yeartodate])
         ->whereYear('FECHA', $yearpasado)
         ->groupBy('monthKey')
         ->orderBy('FECHA', 'ASC')
@@ -77,8 +140,10 @@ class HomeController extends Controller
         foreach ($yearPasadoGrafica as $venta) {
             $ventasPasadoGrafica[$venta->monthKey - 1] = $venta->sums;
         }
+
         $ventasGrafica = json_encode($ventasGrafica);
         $ventasPasadoGrafica = json_encode($ventasPasadoGrafica);
+        $meses = json_encode($meses);
 
         // TARJETAS //
 
@@ -133,8 +198,33 @@ class HomeController extends Controller
             ->orWhere('TIPO', 'N');
         })
         ->where('ANTERIOR', '!=', 'GLOBAL')
+        ->sum('TOTAL');
+
+            
+            $ventasMesYearPasado = Documentos::where(function ($q) {
+                $q->where('TIPO', 'F')
+                ->orWhere('TIPO', 'N');
+            })
+            ->where('ANTERIOR', '!=', 'GLOBAL')
+            ->whereBetween('FECHA', [Carbon::now()->startOfMonth()->subYear(), Carbon::now()->subYear()])
             ->sum('TOTAL');
 
+        $ventasYear = Documentos::whereYear('FECHA', "$year")
+        ->where(function ($q) {
+            $q->where('TIPO', 'F')
+            ->orWhere('TIPO', 'N');
+        })
+            ->where('ANTERIOR', '!=', 'GLOBAL')
+            ->sum('TOTAL');
+
+        $ventasYearPasado = Documentos::where(function ($q) {
+            $q->where('TIPO', 'F')
+            ->orWhere('TIPO', 'N');
+        })
+            ->where('ANTERIOR', '!=', 'GLOBAL')
+            ->whereBetween('FECHA', [date('Y-01-01', strtotime("-1 year")), $yeartodate])
+            ->sum('TOTAL');
+        
         $ventasTotalesHoyMesPasado = Documentos::where('FECHA', "$hoyMesPasado")
         ->where(function ($q) {
             $q->where('TIPO', 'F')
@@ -244,7 +334,14 @@ class HomeController extends Controller
             'metaCrecimiento',
             'yearActualGrafica',
             'ventasGrafica',
-            'ventasPasadoGrafica'
+            'ventasPasadoGrafica',
+            'ventasYear',
+            'meses',
+            'ventasMesGrafica',
+            'ventasMesPasadoGrafica',
+            'dias',
+            'ventasMesYearPasado',
+            'ventasYearPasado'
             )
         );
     }
