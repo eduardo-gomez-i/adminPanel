@@ -12,11 +12,11 @@
     </button>
     <div class="collapse navbar-collapse justify-content-end">
       <ul class="navbar-nav">
-        {{-- <li class="nav-item">
+        <li class="nav-item">
           <a href="{{ route('home') }}" class="nav-link">
             <i class="material-icons">dashboard</i> {{ __('Dashboard') }}
           </a>
-        </li> --}}
+        </li>
         <!--<li class="nav-item{{ $activePage == 'register' ? ' active' : '' }}">
           <a href="{{ route('register') }}" class="nav-link">
             <i class="material-icons">person_add</i> {{ __('Registro') }}

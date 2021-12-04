@@ -36,6 +36,8 @@ Route::group(['middleware' => 'auth'], function() {
     Route::resource('roles', App\Http\Controllers\RoleController::class);
 
     Route::get('/almacen', [App\Http\Controllers\AlmacenController::class, 'index'])->name('almacen');
+    Route::get('/almacenistas', [App\Http\Controllers\AlmacenController::class, 'registroAlmacen'])->name('registroAlmacen');
+    Route::post('/almacenistasReg', [App\Http\Controllers\AlmacenController::class, 'registroAlmacenPost'])->name('registroAlmacenPost');
     Route::get('/ventas', [App\Http\Controllers\VentasController::class, 'index'])->name('ventas');
 
     Route::prefix('cajas')->group(function () {
@@ -48,4 +50,5 @@ Route::group(['middleware' => 'auth'], function() {
         Route::get('/infonavit', [App\Http\Controllers\CajasController::class, 'getInfonavit'])->name('cajas.infonavit');
         Route::get('/cancelados', [App\Http\Controllers\CajasController::class, 'getCancelados'])->name('cajas.cancelados');
     });
+
 });

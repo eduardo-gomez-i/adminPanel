@@ -5,6 +5,9 @@
     <div class="row">
       <div class="col-md-12">
         <div class="row">
+          <div class="col-m2-12">
+            <a class="btn btn-info" href="{{ route('registroAlmacen') }}">Registrar Documento</a>
+          </div>
           <div class="col-md-12">
             <div class="card">
               <div class="card-header card-header-primary">
