@@ -29,6 +29,7 @@
         "datatables.net-buttons-bs4": "^2.0.1",
         "jszip": "^3.7.1",
         "pdfmake": "^0.2.3",
-        "vuejs-datatable": "^2.0.0-alpha.7"
+        "vuejs-datatable": "^2.0.0-alpha.7",
+        "vuejs-datepicker": "^1.6.2"
     }
 }

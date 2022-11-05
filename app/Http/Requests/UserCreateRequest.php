@@ -24,7 +24,7 @@ class UserCreateRequest extends FormRequest
     public function rules()
     {
         return [
-            'name' => 'required|min:3',
+            'name' => 'required',
             'username' => 'required|unique:users',
             'email' => 'required|email|unique:users',
             'password' => 'required'
@@ -34,7 +34,7 @@ class UserCreateRequest extends FormRequest
     public function messages()
     {
         return [
-            'name.required' => 'El nombre es requerido amigo'
+            'name.required' => 'El nombre es requerido'
         ];
     }
 }

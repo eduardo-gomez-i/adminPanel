@@ -4,13 +4,13 @@
     <div class="navbar-wrapper">
       <a class="navbar-brand" href="#">{{ $titlePage }}</a>
     </div>
-    <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation">
+    <button class="navbar-toggler" type="button" data-toggle="collapse" aria-controls="navigation-index" aria-expanded="false" aria-label="Toggle navigation" data-target="#navbarText">
       <span class="sr-only">Toggle navigation</span>
       <span class="navbar-toggler-icon icon-bar"></span>
       <span class="navbar-toggler-icon icon-bar"></span>
       <span class="navbar-toggler-icon icon-bar"></span>
     </button>
-    <div class="collapse navbar-collapse justify-content-end">
+    <div class="collapse navbar-collapse justify-content-end" id="navbarText">
       <ul class="navbar-nav">
         <li class="nav-item">
           <a class="nav-link" href="{{ route('home') }}">
@@ -20,19 +20,22 @@
             </p>
           </a>
         </li>
-        <li class="nav-item dropdown">
-          <a class="nav-link" href="#pablo" id="navbarDropdownProfile" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+        <li class="nav-item">
+          <a class="nav-link" href="{{ route('users.show', auth()->user()->id) }}" id="navbarDropdownProfile">
             <i class="material-icons">person</i>
-            <p class="d-lg-none d-md-block">
-              {{ __('Account') }}
-            </p>
+            <!--<p class="d-lg d-md-block">
+              Salir
+            </p>-->
           </a>
-          <div class="dropdown-menu dropdown-menu-right" aria-labelledby="navbarDropdownProfile">
-            <!--<a class="dropdown-item" href="#">{{ __('Profile') }}</a>
-            <a class="dropdown-item" href="#">{{ __('Settings') }}</a>
-            <div class="dropdown-divider"></div>-->
-            <a class="dropdown-item" href="{{ route('logout') }}" onclick="event.preventDefault();document.getElementById('logout-form').submit();">{{ __('Log out') }}</a>
-          </div>
+        </li>
+        <li class="nav-item">
+          <a class="nav-link" href="{{ route('logout') }}" id="navbarDropdownProfile" onclick="event.preventDefault();document.getElementById('logout-form').submit();">
+            <i>Salir</i>
+            <!--<i class="material-icons">person</i>
+            <p class="d-lg d-md-block">
+              Salir
+            </p>-->
+          </a>
         </li>
       </ul>
     </div>

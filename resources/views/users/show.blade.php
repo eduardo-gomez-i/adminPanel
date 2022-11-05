@@ -17,24 +17,24 @@
             </div>
             @endif
             <div class="row">
-              <div class="col-md-4">
+              <div class="col-md-8">
                 <div class="card card-user">
                   <div class="card-body">
                     <p class="card-text">
-                      <div class="author">
-                        <a href="#">
-                          <img src="{{ asset('/img/default-avatar.png') }}" alt="image" class="avatar">
-                          <h5 class="title mt-3">{{ $user->name }}</h5>
-                        </a>
-                        <p class="description">
+                    <div class="author">
+                      <a href="#">
+                        <img src="{{ isset($user->foto) ? asset('images/'.$user->foto) : asset('/img/default-avatar.png')  }}" alt="image" class="avatar">
+                        <h5 class="title mt-3">{{ $user->name }}</h5>
+                      </a>
+                      <p class="description">
                         {{ $user->username }} <br>
                         {{ $user->email }} <br>
-                        {{ $user->created_at }}
-                        </p>
-                      </div>
+                        {{ $user->fecha_nacimiento }}
+                      </p>
+                    </div>
                     </p>
                     <div class="card-description">
-                       Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam officia corporis molestiae aliquid provident placeat.
+                      {{ $user->aficiones }}
                     </div>
                   </div>
                   <div class="card-footer">
@@ -43,23 +43,24 @@
                     </div>
                   </div>
                 </div>
-              </div><!--end card user-->
+              </div>
+              <!--end card user-->
 
-              <div class="col-md-4">
+              <!--<div class="col-md-4">
                 <div class="card card-user">
                   <div class="card-body">
                     <p class="card-text">
-                      <div class="author">
-                        <a href="#" class="d-flex">
-                          <img src="{{ asset('/img/default-avatar.png') }}" alt="image" class="avatar">
-                          <h5 class="title mx-3">{{ $user->name }}</h5>
-                        </a>
-                        <p class="description">
-                          {{ $user->username }} <br>
-                          {{ $user->email }} <br>
-                          {{ $user->created_at }}
-                        </p>
-                      </div>
+                    <div class="author">
+                      <a href="#" class="d-flex">
+                        <img src="{{ asset('/img/default-avatar.png') }}" alt="image" class="avatar">
+                        <h5 class="title mx-3">{{ $user->name }}</h5>
+                      </a>
+                      <p class="description">
+                        {{ $user->username }} <br>
+                        {{ $user->email }} <br>
+                        {{ $user->created_at }}
+                      </p>
+                    </div>
                     </p>
                     <div class="card-description">
                       Lorem ipsum dolor sit amet consectetur adipisicing elit. Veniam officia corporis molestiae aliquid provident
@@ -73,7 +74,8 @@
                     </div>
                   </div>
                 </div>
-              </div><!--end card user 2-->
+              </div>
+              end card user 2-->
 
               <!--Start third-->
               <div class="col-md-4">
@@ -99,18 +101,30 @@
                           <td>{!! $user->username !!}</td>
                         </tr>
                         <tr>
-                          <th>Created at</th>
-                          <td><a href="#" target="_blank">{{  $user->created_at  }}</a></td>
+                          <th>Telefono</th>
+                          <td><span>{{ $user->telefono }}</span></td>
                         </tr>
                         <tr>
-                            <th>Roles</th>
-                            <td>
-                                @forelse ($user->roles as $role)
-                                    <span class="badge rounded-pill bg-dark text-white">{{ $role->name }}</span>
-                                @empty
-                                    <span class="badge badge-danger bg-danger">No roles</span>
-                                @endforelse
-                            </td>
+                          <th>Fecha de nacimiento</th>
+                          <td><span>{{ $user->fecha_nacimiento }}</span></td>
+                        </tr>
+                        <tr>
+                          <th>Creado en</th>
+                          <td><a href="#" target="_blank">{{ $user->created_at  }}</a></td>
+                        </tr>
+                        <tr>
+                          <th>Comision</th>
+                          <td><span>{{number_format($comision->COMISION, 2, ".", ",")}}</span></td>
+                        </tr>
+                        <tr>
+                          <th>Roles</th>
+                          <td>
+                            @forelse ($user->roles as $role)
+                            <span class="badge rounded-pill bg-dark text-white">{{ $role->name }}</span>
+                            @empty
+                            <span class="badge badge-danger bg-danger">No roles</span>
+                            @endforelse
+                          </td>
                         </tr>
                       </tbody>
                     </table>
@@ -118,7 +132,7 @@
                   <div class="card-footer">
                     <div class="button-container">
                       <a href="{{ route('users.index') }}" class="btn btn-sm btn-success mr-3"> Volver </a>
-                      <a href="#" class="btn btn-sm btn-twitter"> Editar </a>
+                      <a href="{{ $user->id }}/edit" class="btn btn-sm btn-twitter"> Editar </a>
                     </div>
                   </div>
                 </div>

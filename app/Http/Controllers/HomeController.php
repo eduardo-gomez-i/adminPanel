@@ -6,6 +6,8 @@ use App\Models\Cajas;
 use App\Models\Documentos;
 use App\Models\Partidas;
 use App\Models\Personal;
+use App\Models\Personas;
+use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
 
@@ -26,18 +28,62 @@ class HomeController extends Controller
      *
      * @return \Illuminate\View\View
      */
+    public function PersonasDia(Request $request)
+    {
+        //$hoy = Carbon::today();
+        $hoy = $request->fecha;
+
+        $existe = Personas::where('fecha', $hoy)->first();
+
+        if ($existe === null) {
+            $personas = new Personas;
+
+            $personas->numero = $request->numero;
+            $personas->fecha = $hoy;
+
+            $personas->save();
+        }else{
+            $personas = Personas::where('fecha', $hoy)
+            ->update(['numero' => $request->numero]);
+        }
+
+        return redirect()->back();
+    }
+
     public function index()
     {
         // FECHAS //
+        $mesActualString = Carbon::now()->locale('es');
+        $mesPasadoString = Carbon::now()->subMonth()->locale('es');
+
         $hoy = Carbon::today();
         $numeroDia = Carbon::today()->day;
         $mes = Carbon::today()->month;
-        $hoyMesPasado = Carbon::today()->subMonth();
-        $mesAnterior = Carbon::today()->subMonth()->month;
+        $hoyMesPasado = Carbon::today()->subMonth()->endOfMonth();
+        $hoyMesPasadoInicio = Carbon::today()->subMonth()->startOfMonth();
+        $mesAnterior = Carbon::today()->month;
         $year = Carbon::today()->year;
         $yearpasado = Carbon::today()->subYear()->year;
+        $hoyYearPasado = Carbon::today()->subYear();
 
-        $yeartodate = Carbon::today()->endOfMonth()->subYear();
+        //$yeartodate = Carbon::today()->endOfMonth()->subYear();
+        $yeartodate = Carbon::today()->subYear();
+        $yeartodateEndOfMonth = Carbon::today()->endOfMonth()->subYear();
+
+        //Personas que entraron hoy
+
+        $personas = Personas::where('fecha', $hoy)->first();
+        $visitas = Personas::whereBetween('FECHA', [Carbon::now()->startOfMonth(), $hoy])->orderBy('FECHA')->get();
+        $fechasVisitas = $visitas->pluck('fecha')->all();
+        $contDocumentosMes = Documentos::select(DB::raw('count(*) as contDocumentos'), 'FECHA')
+        ->whereIn('FECHA', $fechasVisitas)
+        ->where(function ($q) {
+            $q->where('TIPO', 'F')
+            ->orWhere('TIPO', 'N');
+        })
+        ->groupBy('FECHA')
+        ->where('ANTERIOR', '!=', 'GLOBAL')
+        ->get();
 
         // GRAFICAS //
 
@@ -77,6 +123,8 @@ class HomeController extends Controller
                 $q->where('TIPO', 'F')
                 ->orWhere('TIPO', 'N');
             })
+            ->where('ESTADO', '!=', 'C')
+            ->Where('ESTADO', '!=', 'R')
             ->where('ANTERIOR', '!=', 'GLOBAL')
             ->whereBetween('FECHA', [Carbon::now()->startOfMonth()->subYear(), Carbon::now()->subYear()])
             ->groupBy('dayKey')
@@ -95,6 +143,12 @@ class HomeController extends Controller
         
         foreach ($monthDayyearPasado as $ventamtdp) {
             $ventasMesPasadoGrafica[ltrim($ventamtdp->dayKey, "0")] = $ventamtdp->sums;
+        }
+
+        for ($i = 0; $i < $numeroDia; $i++) {
+            if (!isset($ventasMesPasadoGrafica[$i + 1])) {
+                $ventasMesPasadoGrafica[$i + 1] = '0';
+            }
         }
         
 
@@ -127,8 +181,7 @@ class HomeController extends Controller
             ->orWhere('TIPO', 'N');
         })
         ->where('ANTERIOR', '!=', 'GLOBAL')
-        ->whereBetween('FECHA',[date('Y-01-01', strtotime("-1 year")), $yeartodate])
-        ->whereYear('FECHA', $yearpasado)
+        ->whereBetween('FECHA',[date('Y-01-01', strtotime("-1 year")), $yeartodateEndOfMonth])
         ->groupBy('monthKey')
         ->orderBy('FECHA', 'ASC')
         ->get();
@@ -165,7 +218,14 @@ class HomeController extends Controller
         ->count();
 
         $countCancelados = Documentos::where('FECHA', "$hoy")
-        ->where('ESTADO', 'C')
+        ->where(function ($q) {
+                $q->where('ESTADO', 'C')
+                    ->orWhere('ESTADO', 'R');
+            })
+        ->where(function ($q) {
+            $q->where('TIPO', 'F')
+                ->orWhere('TIPO', 'N');
+        })
         ->with('clientes')
         ->count();
 
@@ -191,6 +251,14 @@ class HomeController extends Controller
         ->where('ANTERIOR', '!=', 'GLOBAL')
             ->sum('TOTAL');
 
+        $ventasTotalesHoyYearPasado = Documentos::where('FECHA', "$hoyYearPasado")
+        ->where(function ($q) {
+            $q->where('TIPO', 'F')
+            ->orWhere('TIPO', 'N');
+        })
+        ->where('ANTERIOR', '!=', 'GLOBAL')
+            ->sum('TOTAL');
+
         $ventasMes = Documentos::whereMonth('FECHA', "$mes")
         ->whereYear('FECHA', "$year")
         ->where(function ($q) {
@@ -201,13 +269,13 @@ class HomeController extends Controller
         ->sum('TOTAL');
 
             
-            $ventasMesYearPasado = Documentos::where(function ($q) {
-                $q->where('TIPO', 'F')
-                ->orWhere('TIPO', 'N');
-            })
-            ->where('ANTERIOR', '!=', 'GLOBAL')
-            ->whereBetween('FECHA', [Carbon::now()->startOfMonth()->subYear(), Carbon::now()->subYear()])
-            ->sum('TOTAL');
+        $ventasMesYearPasado = Documentos::where(function ($q) {
+            $q->where('TIPO', 'F')
+            ->orWhere('TIPO', 'N');
+        })
+        ->where('ANTERIOR', '!=', 'GLOBAL')
+        ->whereBetween('FECHA', [Carbon::now()->startOfMonth()->subYear(), Carbon::now()->subYear()])
+        ->sum('TOTAL');
 
         $ventasYear = Documentos::whereYear('FECHA', "$year")
         ->where(function ($q) {
@@ -225,7 +293,7 @@ class HomeController extends Controller
             ->whereBetween('FECHA', [date('Y-01-01', strtotime("-1 year")), $yeartodate])
             ->sum('TOTAL');
         
-        $ventasTotalesHoyMesPasado = Documentos::where('FECHA', "$hoyMesPasado")
+        $ventasTotalesHoyMesPasado = Documentos::whereBetween('FECHA', ["$hoyMesPasadoInicio", "$hoyMesPasado"])
         ->where(function ($q) {
             $q->where('TIPO', 'F')
             ->orWhere('TIPO', 'N');
@@ -234,23 +302,38 @@ class HomeController extends Controller
             ->sum('TOTAL');
 
         if ($ventasTotalesHoyMesPasado > 0) {
-            $crecimiento = (($ventasTotalesHoy / $ventasTotalesHoyMesPasado) - 1) * 100;
+            //$crecimiento = (($ventasTotalesHoy / $ventasTotalesHoyMesPasado) - 1) * 100;
+            $crecimiento = (($ventasTotalesHoy - $ventasTotalesHoyMesPasado) / $ventasTotalesHoyMesPasado) * 100;
         } else {
             $crecimiento = 0;
         }
 
-        $ventasMesAnterior = Documentos::whereMonth('FECHA', "$mesAnterior")
-        ->whereYear('FECHA', "$year")
-        ->where(function ($q) {
-            $q->where('TIPO', 'F')
-            ->orWhere('TIPO', 'N');
-        })
-        ->where('ANTERIOR', '!=', 'GLOBAL')
-            ->sum('TOTAL');
+        if ($mesAnterior == 12) {
+            $ventasMesAnterior = Documentos::whereMonth('FECHA', "$mesAnterior")
+            ->whereYear('FECHA', $year)
+            ->where(function ($q) {
+                $q->where('TIPO', 'F')
+                ->orWhere('TIPO', 'N');
+            })
+                ->where('ANTERIOR', '!=', 'GLOBAL')
+                ->sum('TOTAL');
+
+            
+        }else {
+            $ventasMesAnterior = Documentos::whereMonth('FECHA', "$mesAnterior")
+            ->whereYear('FECHA', $year - 1)
+            ->where(function ($q) {
+                $q->where('TIPO', 'F')
+                    ->orWhere('TIPO', 'N');
+            })
+                ->where('ANTERIOR', '!=', 'GLOBAL')
+                ->sum('TOTAL');
+        }
 
         if ($ventasMesAnterior > 0) {
-            $porcVentasMes = ($ventasMes  / $ventasMesAnterior) * 100;
-            $metaCrecimiento = (($ventasMes  / $ventasMesAnterior) - 1) * 100;
+            $metaValor = $ventasMesAnterior * 1.10;
+            $porcVentasMes = (($ventasMes- $metaValor)/ $metaValor)*100;
+            $metaCrecimiento = (($ventasMes - $metaValor) / $metaValor) * 100;
         } else {
             $porcVentasMes = 100;
             $metaCrecimiento = 100;
@@ -314,7 +397,14 @@ class HomeController extends Controller
         ->get();
 
         $canceladas = Documentos::where('FECHA', "$hoy")
-        ->where('ESTADO', 'C')
+        ->where(function ($q) {
+                $q->where('ESTADO', 'C')
+                    ->orWhere('ESTADO', 'R');
+            })
+        ->where(function ($q) {
+            $q->where('TIPO', 'F')
+                ->orWhere('TIPO', 'N');
+        })
         ->with('clientes')
         ->get();
 
@@ -341,7 +431,15 @@ class HomeController extends Controller
             'ventasMesPasadoGrafica',
             'dias',
             'ventasMesYearPasado',
-            'ventasYearPasado'
+            'ventasYearPasado',
+            'ventasMesAnterior',
+            'ventasTotalesHoyYearPasado',
+            'ventasTotalesHoyMesPasado',
+            'mesActualString',
+            'mesPasadoString',
+            'personas',
+            'visitas',
+            'contDocumentosMes'
             )
         );
     }

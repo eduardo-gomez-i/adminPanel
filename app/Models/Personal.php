@@ -13,12 +13,12 @@ class Personal extends Model
 
     public function Documentos()
     {
-        return $this->hasMany(Documentos::class, 'EMISOR', 'CATEGORIA');
+        return $this->hasMany(Documentos::class, 'VENDEDORID', 'PERID');
     }
 
     public function Partidas()
     {
-        return $this->hasMany(Partidas::class, 'EMISOR', 'CATEGORIA');
+        return $this->hasMany(Partidas::class, 'VENDEDORID', 'PERID');
     }
 
     public function scopeValidos($query)
@@ -30,6 +30,7 @@ class Personal extends Model
             ->where('CATEGORIA', '!=', 'LB')
             ->where('CATEGORIA', '!=', 'FS')
             ->where('CATEGORIA', '!=', 'LS')
-            ->where('CATEGORIA', '!=', 'JC');
+            ->where('CATEGORIA', '!=', 'JC')
+            ->where('ESTADO', 'A');
     }
 }

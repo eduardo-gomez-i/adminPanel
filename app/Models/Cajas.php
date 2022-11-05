@@ -10,6 +10,7 @@ class Cajas extends Model
     use HasFactory;
     protected $connection = 'ferrum';
     protected $table = 'caj';
+    protected $keyType = 'string';
 
     public function clientes()
     {

@@ -4,8 +4,11 @@ namespace App\Http\Controllers;
 
 use App\Http\Requests\UserCreateRequest;
 use App\Http\Requests\UserEditRequest;
+use App\Models\Documentos;
 use App\Models\User;
 use Illuminate\Http\Request;
+use Illuminate\Support\Carbon;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Gate;
 use Spatie\Permission\Models\Role;
 
@@ -28,15 +31,25 @@ class UserController extends Controller
     public function store(UserCreateRequest $request)
     {
         // $request->validate([
-        //     'name' => 'required|min:3|max:5',
-        //     'username' => 'required',
-        //     'email' => 'required|email|unique:users',
-        //     'password' => 'required'
-        // ]);
-        $user = User::create($request->only('name', 'username', 'email')
-            + [
-                'password' => bcrypt($request->input('password')),
-            ]);
+            //     'name' => 'required|min:3|max:5',
+            //     'username' => 'required',
+            //     'email' => 'required|email|unique:users',
+            //     'password' => 'required'
+            // ]);
+            if ($request->file('foto') != null) {
+                $fileName = time().'_'. $request->foto->getClientOriginalName();
+                $request->foto->move(public_path('images'), $fileName);
+
+                $user = User::create($request->only('name', 'username', 'email', 'telefono', 'fecha_nacimiento', 'aficiones')
+                + [
+                    'password' => bcrypt($request->input('password')),
+                ]+ ['foto' => $fileName]);
+            }else {
+            $user = User::create($request->only('name', 'username', 'email', 'telefono', 'fecha_nacimiento', 'aficiones')
+                + [
+                    'password' => bcrypt($request->input('password')),
+                ]);
+        }
 
         $roles = $request->input('roles', []);
         $user->syncRoles($roles);
@@ -45,11 +58,28 @@ class UserController extends Controller
 
     public function show(User $user)
     {
+        $hoy = Carbon::today();
+        $primerDia = Carbon::now()->startOfMonth();
         abort_if(Gate::denies('user_show'), 403);
         // $user = User::findOrFail($id);
         // dd($user);
         $user->load('roles');
-        return view('users.show', compact('user'));
+
+        $comision = Documentos::select(DB::raw('SUM(ORISUBTOTAL1 + ORISUBTOTAL2) AS SUBTOTAL0'), DB::raw('SUM((ORISUBTOTAL1 + ORISUBTOTAL2) *.0035) AS COMISION'))
+        ->leftJoin('per', 'doc.VENDEDORID', '=', 'per.PERID')
+        ->where(function ($q) {
+            $q->where('doc.TIPO', 'F')
+            ->orWhere('doc.TIPO', 'N');
+        })
+        ->whereRaw("(INSTR(PER.CATEGORIA, 'EO')=0)")
+        ->whereRaw("(INSTR(PER.CATEGORIA, 'JV')=0)")
+        ->whereRaw("(INSTR(PER.CATEGORIA, 'C2')=0)")
+        ->whereRaw("(INSTR(PER.CATEGORIA, 'AD')=0)")
+        ->whereBetween('doc.FECHA', [$primerDia, $hoy])
+        ->where('per.CATEGORIA', $user->username)
+        ->first();
+        
+        return view('users.show', compact('user', 'comision'));
     }
 
     public function edit(User $user)
@@ -63,10 +93,15 @@ class UserController extends Controller
     public function update(UserEditRequest $request, User $user)
     {
         // $user=User::findOrFail($id);
-        $data = $request->only('name', 'username', 'email');
+        $data = $request->only('name', 'username', 'email', 'telefono', 'fecha_nacimiento', 'aficiones');
         $password=$request->input('password');
         if($password)
             $data['password'] = bcrypt($password);
+            if ($request->file('foto') != null) {
+                $fileName = time() . '_' . $request->foto->getClientOriginalName();
+                $request->foto->move(public_path('images'), $fileName);
+                $data['foto'] = $fileName;
+            }
         // if(trim($request->password)=='')
         // {
         //     $data=$request->except('password');

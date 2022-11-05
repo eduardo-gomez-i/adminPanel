@@ -1,6 +1,8 @@
 <?php
 
+use App\Exports\EtiquetasExport;
 use Illuminate\Support\Facades\Route;
+use Maatwebsite\Excel\Facades\Excel;
 
 /*
 |--------------------------------------------------------------------------
@@ -28,15 +30,26 @@ Route::group(['middleware' => 'auth'], function() {
     Route::put('/users/{user}', [App\Http\Controllers\UserController::class, 'update'])->name('users.update');
     Route::delete('/users/{user}', [App\Http\Controllers\UserController::class, 'destroy'])->name('users.delete');
 
+    Route::post('/PersonasDia', [App\Http\Controllers\HomeController::class, 'PersonasDia'])->name('PersonasDia');
+
+
     Route::resource('posts', App\Http\Controllers\PostController::class);
     Route::resource('impresoras', App\Http\Controllers\ImpresoraController::class);
     Route::resource('documentos', App\Http\Controllers\DocumentoController::class);
 
     Route::resource('permissions', App\Http\Controllers\PermissionController::class);
     Route::resource('roles', App\Http\Controllers\RoleController::class);
+    Route::post('/nuevosProductosExport', [App\Http\Controllers\NuevosProductosController::class, 'exportar'])->name('nuevos.exportar');
+    Route::get('/nuevosProductos', [App\Http\Controllers\NuevosProductosController::class, 'index'])->name('nuevos.index');
+    Route::get('/excel', function () {
+        return Excel::download(new EtiquetasExport, 'products.xlsx');
+    })->name('excel');
+
+    Route::get('/comisionesV', [App\Http\Controllers\ComisionesController::class, 'vendedores'])->name('comisionesV');
 
     Route::get('/almacen', [App\Http\Controllers\AlmacenController::class, 'index'])->name('almacen');
     Route::get('/almacenistas', [App\Http\Controllers\AlmacenController::class, 'registroAlmacen'])->name('registroAlmacen');
+    Route::get('/almacenistasBusqueda', [App\Http\Controllers\AlmacenController::class, 'busquedaAlmacen'])->name('busquedaAlmacen');
     Route::post('/almacenistasReg', [App\Http\Controllers\AlmacenController::class, 'registroAlmacenPost'])->name('registroAlmacenPost');
     Route::get('/ventas', [App\Http\Controllers\VentasController::class, 'index'])->name('ventas');
 
@@ -49,6 +62,9 @@ Route::group(['middleware' => 'auth'], function() {
         Route::get('/cheques', [App\Http\Controllers\CajasController::class, 'getCheques'])->name('cajas.cheques');
         Route::get('/infonavit', [App\Http\Controllers\CajasController::class, 'getInfonavit'])->name('cajas.infonavit');
         Route::get('/cancelados', [App\Http\Controllers\CajasController::class, 'getCancelados'])->name('cajas.cancelados');
+        Route::get('/depositos', [App\Http\Controllers\CajasController::class, 'getDepositos'])->name('cajas.depositos');
+        Route::get('/conekta', [App\Http\Controllers\CajasController::class, 'getConekta'])->name('cajas.conekta');
+        Route::get('/link', [App\Http\Controllers\CajasController::class, 'getLink'])->name('cajas.link');
     });
 
 });

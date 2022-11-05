@@ -29,7 +29,7 @@ class UserEditRequest extends FormRequest
             // Logic for findOrFail
             // 'username' => 'unique:users,username,'.$this->user.'|required',
 
-            'username' => ['required', 'min:3', 'unique:users,username,' . $user->id],
+            'username' => ['required', 'min:2', 'unique:users,username,' . $user->id],
             'email' => [
                 'required', 'unique:users,email,' . request()->route('user')->id
             ],

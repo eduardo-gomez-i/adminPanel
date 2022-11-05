@@ -16901,10 +16901,10 @@ label {
 }
 
 .card .author .avatar {
-  width: 30px;
-  height: 30px;
+  max-width: 120px;
+  /*height: 90px;*/
   overflow: hidden;
-  border-radius: 50%;
+  /*border-radius: 50%;*/
   margin-right: 5px;
 }
 

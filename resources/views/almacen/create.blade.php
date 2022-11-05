@@ -45,8 +45,8 @@
                         <button type="submit" class="btn btn-primary">Registrar</button>
                     </div>
                     <!--End footer-->
+                </form>
             </div>
-            </form>
         </div>
     </div>
 </div>
