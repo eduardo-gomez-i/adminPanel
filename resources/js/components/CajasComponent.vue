@@ -139,7 +139,7 @@
                   v-for="factura in datosFacturas"
                   :key="factura.pagdoc.documento.DOCID"
                 >
-                  <td :id="factura.pagdoc.documento.DOCID">{{ factura.pagdoc.documento.NUMERO }}</td>
+                  <td :id="factura.pagdoc.documento.DOCID">{{ factura.pagdoc.documento.cfd.FOLIO }}</td>
                   <td>{{ factura.FECHA }}</td>
                   <td>{{ factura.HORA }}</td>
                   <td>{{ factura.clientes.NOMBRE }}</td>

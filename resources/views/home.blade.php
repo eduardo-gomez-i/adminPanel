@@ -229,7 +229,7 @@
                         <h4 class="card-title">Ventas año en curso vs año pasado</h4>
                     </div>
                     <div class="card-body">
-                        <button id="downloadExcel" class="btn btn-success">Descargar</button>
+                        <a href="{{ route('downloadYearInfo') }}" class="btn btn-success">Descargar</a>
                         <div id="year" style="height: 450px; width: 100%;"></div>
                     </div>
                 </div>
@@ -629,10 +629,7 @@
         chart.render();
 
         document.getElementById("downloadExcel").addEventListener("click", function() {
-            downloadAsExcel({
-                filename: "chart-data",
-                chart: yearChart
-            })
+            
         });
 
         document.getElementById("downloadExcel2").addEventListener("click", function() {

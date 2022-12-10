@@ -66,11 +66,11 @@ class CajasController extends Controller
 
         if ($request->caja == 1) {
             $efectivoFac = Cajas::where('fecha', "$hoy")
-                ->where('MOV', 'E')
-                ->where('REFERENCIA', 'FAC')
-                //-> orderBY('HORA', 'desc')
-                ->with('pagdoc.Documento', 'clientes')
-                ->get();
+            ->where('MOV', 'E')
+            ->where('REFERENCIA', 'FAC')
+            //-> orderBY('HORA', 'desc')
+            ->with('pagdoc.Documento.cfd', 'clientes')
+            ->get();
         }else {
             $idUsuario = Personal::where('CATEGORIA', $request->caja)
             ->first();
@@ -80,7 +80,7 @@ class CajasController extends Controller
             ->where('REFERENCIA', 'FAC')
             //-> orderBY('HORA', 'desc')
             ->where('EMISORID', "$idUsuario->PERID")
-            ->with('pagdoc.Documento', 'clientes')
+            ->with('pagdoc.Documento.cfd', 'clientes')
             ->get();
         }
 
@@ -143,7 +143,7 @@ class CajasController extends Controller
                     ->orWhere('MOV', 'Y')
                     ->orWhere('MOV', 'Z');
             })
-            ->with('pagdoc.Documento', 'clientes')
+            ->with('pagdoc.Documento.cfd', 'clientes')
             ->get();
         }else {
             $idUsuario = Personal::where('CATEGORIA', $request->caja)
@@ -168,7 +168,7 @@ class CajasController extends Controller
                     ->orWhere('MOV', 'Z');
             })
             ->where('EMISORID', "$idUsuario->PERID")
-            ->with('pagdoc.Documento', 'clientes')
+            ->with('pagdoc.Documento.cfd', 'clientes')
             ->get();
         }
 

@@ -16,6 +16,11 @@ class Documentos extends Model
         return $this->hasOne(Clientes::class, 'CLIENTEID', 'CLIENTEID');
     }
 
+    public function cfd()
+    {
+        return $this->hasOne(CFD::class, 'DOCID', 'DOCID')->select(['CFDID', 'DOCID','FOLIO']);
+    }
+
     public function Personal()
     {
         return $this->hasOne('Laraspace\Per', 'EMISOR', 'CATEGORIA');

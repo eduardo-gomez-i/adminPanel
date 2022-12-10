@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Exports\DocumentosExport;
 use App\Models\Cajas;
 use App\Models\Documentos;
 use App\Models\Partidas;
@@ -10,6 +11,7 @@ use App\Models\Personas;
 use Illuminate\Http\Request;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Maatwebsite\Excel\Facades\Excel;
 
 class HomeController extends Controller
 {
@@ -442,5 +444,9 @@ class HomeController extends Controller
             'contDocumentosMes'
             )
         );
+    }
+
+    public function downloadYearInfo(){
+        return Excel::download(new DocumentosExport, 'Documentos.xlsx');
     }
 }

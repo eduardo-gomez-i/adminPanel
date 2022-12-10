@@ -16,7 +16,6 @@
   <!-- CSS Files -->
   <link href="{{ asset('css/material-dashboard.css?v=2.1.1') }}" rel="stylesheet" />
   <link href="{{asset('css/app.css')}}" rel="stylesheet" type="text/css">
-  <script src="{{ asset('js/app.js') }}" defer></script>
 </head>
 
 <body class="{{ $class ?? '' }}">
