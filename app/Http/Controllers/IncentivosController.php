@@ -10,9 +10,9 @@ use Illuminate\Support\Facades\DB;
 class IncentivosController extends Controller
 {
     public function index(){
-        $inicioSemana = Carbon::parse('2020-12-17')->startOfWeek()->format('Y-m-d');
-        $finSemana = Carbon::parse('2020-12-17')->endOfWeek()->format('Y-m-d');
-        $numeroDia = Carbon::parse('2020-12-17')->dayOfWeek;
+        $inicioSemana = Carbon::now()->startOfWeek()->format('Y-m-d');
+        $finSemana = Carbon::now()->endOfWeek()->format('Y-m-d');
+        $numeroDia = Carbon::now()->dayOfWeek;
 
         $asistencia = Asistencia::with('trabajador')->select(DB::raw('count(*) as dias_puntuales'), 'id_trabajador', 'hora_entrada', 'fecha')->whereBetween('fecha', [$inicioSemana, $finSemana])->groupBy('id_trabajador')->get();
 
