@@ -18,7 +18,7 @@ class Documentos extends Model
 
     public function cfd()
     {
-        return $this->hasOne(CFD::class, 'DOCID', 'DOCID')->select(['CFDID', 'DOCID','FOLIO']);
+        return $this->hasOne(CFD::class, 'id_documento', 'DOCID')->select(['id_documento', 'folio_documento','numero_documento']);
     }
 
     public function Personal()

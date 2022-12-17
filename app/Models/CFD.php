@@ -9,5 +9,5 @@ class CFD extends Model
 {
     use HasFactory;
     protected $connection = 'ferrum';
-    protected $table = 'cfd';
+    protected $table = 'vista_documentos';
 }

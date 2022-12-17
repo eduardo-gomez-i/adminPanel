@@ -447,6 +447,8 @@ class HomeController extends Controller
     }
 
     public function downloadYearInfo(){
-        return Excel::download(new DocumentosExport, 'Documentos.xlsx');
+        $hoy = Carbon::now()->toDateString();
+
+        return Excel::download(new DocumentosExport, $hoy.'_export_reporte_dias.xlsx');
     }
 }

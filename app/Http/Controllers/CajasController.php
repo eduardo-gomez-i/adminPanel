@@ -113,7 +113,7 @@ class CajasController extends Controller
             //->where('doc.AFECTADOC', 'S')
             //->where('doc.TIPO', 'F')
             ->where('doc.VENCE', '>=', "$hoy")
-                ->with('clientes')
+            ->with('cfd','clientes')
             ->distinct('doc.DOCID')
             ->get();
         
@@ -192,7 +192,7 @@ class CajasController extends Controller
                     ->orWhere('MOV', 'C')
                     ->orWhere('MOV', 'R');
             })
-            ->with('pagdoc.Documento', 'clientes')
+            ->with('pagdoc.Documento.cfd', 'clientes')
             ->get();
         }else {
             $idUsuario = Personal::where('CATEGORIA', $request->caja)
@@ -206,7 +206,7 @@ class CajasController extends Controller
                     ->orWhere('MOV', 'R');
             })
             ->where('EMISORID', "$idUsuario->PERID")
-            ->with('pagdoc.Documento', 'clientes')
+            ->with('pagdoc.Documento.cfd', 'clientes')
             ->get();
         }
 

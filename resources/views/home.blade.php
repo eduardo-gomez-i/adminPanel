@@ -628,10 +628,6 @@
         });
         chart.render();
 
-        document.getElementById("downloadExcel").addEventListener("click", function() {
-            
-        });
-
         document.getElementById("downloadExcel2").addEventListener("click", function() {
             downloadAsExcel({
                 filename: "chart-data",

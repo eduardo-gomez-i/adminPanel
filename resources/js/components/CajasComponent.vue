@@ -139,7 +139,7 @@
                   v-for="factura in datosFacturas"
                   :key="factura.pagdoc.documento.DOCID"
                 >
-                  <td :id="factura.pagdoc.documento.DOCID">{{ factura.pagdoc.documento.cfd.FOLIO }}</td>
+                  <td :id="factura.pagdoc.documento.DOCID">{{ factura.pagdoc.documento.cfd.folio_documento }}</td>
                   <td>{{ factura.FECHA }}</td>
                   <td>{{ factura.HORA }}</td>
                   <td>{{ factura.clientes.NOMBRE }}</td>
@@ -168,7 +168,7 @@
                   v-for="credito in datosCredito"
                   :key="credito.NUMERO"
                 >
-                  <td :id="credito.DOCID">{{ credito.NUMERO }}</td>
+                  <td :id="credito.DOCID">{{ credito.cfd.folio_documento }}</td>
                   <td>{{ credito.FECHA }}</td>
                   <td>{{ credito.HORA }}</td>
                   <td>{{ credito.clientes.NOMBRE }}</td>
@@ -199,7 +199,7 @@
                   :key="tarjeta.pagdoc.documento.NUMERO"
                 >
                   <td>{{ tarjeta.REFERENCIA }}</td>
-                  <td>{{ tarjeta.pagdoc.documento.NUMERO }}</td>
+                  <td>{{ tarjeta.REFERENCIA == 'FAC' ? +tarjeta.pagdoc.documento.NUMERO + 1 : tarjeta.pagdoc.documento.NUMERO }}</td>
                   <td>{{ tarjeta.FECHA }}</td>
                   <td>{{ tarjeta.HORA }}</td>
                   <td>{{ tarjeta.clientes.NOMBRE }}</td>
@@ -229,7 +229,7 @@
                   :key="cheque.pagdoc.documento.NUMERO"
                 >
                   <td>{{ cheque.REFERENCIA }}</td>
-                  <td>{{ cheque.pagdoc.documento.NUMERO }}</td>
+                  <td>{{ cheque.pagdoc.documento.cfd.folio_documento }}</td>
                   <td>{{ cheque.FECHA }}</td>
                   <td>{{ cheque.HORA }}</td>
                   <td>{{ cheque.clientes.NOMBRE }}</td>

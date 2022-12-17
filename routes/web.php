@@ -48,6 +48,7 @@ Route::group(['middleware' => 'auth'], function() {
 
     Route::get('/comisionesV', [App\Http\Controllers\ComisionesController::class, 'vendedores'])->name('comisionesV');
 
+    Route::get('/incentivos', [App\Http\Controllers\IncentivosController::class, 'index'])->name('incentivos.index');
     Route::get('/almacen', [App\Http\Controllers\AlmacenController::class, 'index'])->name('almacen');
     Route::get('/almacenistas', [App\Http\Controllers\AlmacenController::class, 'registroAlmacen'])->name('registroAlmacen');
     Route::get('/almacenistasBusqueda', [App\Http\Controllers\AlmacenController::class, 'busquedaAlmacen'])->name('busquedaAlmacen');

@@ -130,6 +130,12 @@
           <p>{{ __('Checador') }}</p>
         </a>
       </li>
+      <li class="nav-item{{ $activePage == 'Incentivos' ? ' active' : '' }}">
+        <a class="nav-link" href="{{ route('incentivos.index') }}">
+          <i class="material-icons">admin_panel_settings</i>
+          <p>{{ __('Modulo incentivos') }}</p>
+        </a>
+      </li>
       @endcan
       @can('NUEVOS_PRODUCTOS')
       <li class="nav-item{{ $activePage == 'nuevosProductos' ? ' active' : '' }}">

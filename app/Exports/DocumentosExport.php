@@ -95,14 +95,14 @@ class DocumentosExport implements FromCollection, WithHeadings, WithStyles, With
         foreach ($yearPasadoGrafica as $key => $item) {
             if (isset($yearActualGrafica[$key])) {
                 $final[$key] = [
-                    'datePasado' => $item->FECHA,
+                    'datePasado' => $item->FECHA .' '. Carbon::parse($item->FECHA)->locale('es')->dayName,
                     'sumPasado' => $item->sums,
-                    'dateActual' => $yearActualGrafica[$key]->FECHA,
+                    'dateActual' => $yearActualGrafica[$key]->FECHA. ' '. Carbon::parse($yearActualGrafica[$key]->FECHA)->locale('es')->dayName,
                     'sumActual' => $yearActualGrafica[$key]->sums,
                 ];
             } else {
                 $final[$key] = [
-                    'datePasado' => $item->FECHA,
+                    'datePasado' => $item->FECHA .' '. Carbon::parse($item->FECHA)->locale('es')->dayName,
                     'sumPasado' => $item->sums,
                     'dateActual' => '',
                     'sumActual' => '',
