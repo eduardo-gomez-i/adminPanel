@@ -108,9 +108,9 @@
                         </div>
                         <p class="card-category">VENTAS DEL AÑO (YTD)</p>
                         @if($ventasMesYearPasado != 0)
-                        <h3 class="card-title">{{number_format(($ventasYear/$ventasYearPasado)*100, 2, ".", ",")}}%</h3>
+                        <h3 class="card-title">{{number_format(($ventasYear/($ventasYearPasado != 0 ? $ventasYearPasado : 1))*100, 2, ".", ",")}}%</h3>
                         @else
-                        <h3 class="card-title">{{number_format(($ventasYear/$ventasYearPasado)*100, 2, ".", ",")}}%</h3>
+                        <h3 class="card-title">{{number_format(($ventasYear/($ventasYearPasado != 0 ? $ventasYearPasado : 1))*100, 2, ".", ",")}}%</h3>
                         @endif
 
                     </div>
